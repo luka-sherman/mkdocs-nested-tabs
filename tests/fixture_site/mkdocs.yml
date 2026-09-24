@@ -1,0 +1,23 @@
+site_name: Fixture Site
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+
+plugins:
+  - nested-tabs
+
+nav:
+  - Home: index.md
+  - Section A:
+      - Page A1: a1.md
+      - Page A2: a2.md
+  - Section B:
+      - Page B1: b1.md
+      - Page B2: b2.md
+  - Section C:
+      - All: c/index.md
+      - Sub:
+          - Sub 1: c/sub1.md
+          - Sub 2: c/sub2.md

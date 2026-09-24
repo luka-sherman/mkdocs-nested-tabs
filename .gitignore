@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+mkdocs_nested_tabs.egg-info/
+dist/
+build/
+site/
+tests/fixture_site/site/
+.pytest_cache/
+.claude/settings.local.json
