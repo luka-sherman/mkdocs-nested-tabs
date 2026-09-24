@@ -4,8 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mkdocs-nested-tabs"
-version = "0.1.0"
-description = "Display two levels of navigation.tabs instead of Material's hover-only dropdown."
+version = "0.2.0"
 description = "For Material for mkdocs, display two levels of navigation.tabs instead of a hover-only dropdown."
 readme = "README.md"
 requires-python = ">=3.9"
