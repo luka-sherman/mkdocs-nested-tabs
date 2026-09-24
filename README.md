@@ -6,12 +6,12 @@ tab dropdown (one category's children at a time).
 
 ## Status
 
-Early scaffold, ported and generalized from a working implementation. Not yet published.
+Published on PyPI. Ported and generalized from a working implementation.
 
 ## Install
 
 ```bash
-pip install mkdocs-nested-tabs   # not yet published
+pip install mkdocs-nested-tabs
 ```
 
 ```yaml
@@ -28,6 +28,10 @@ plugins:
 Requires `navigation.tabs` to be enabled — this plugin replaces that
 feature's tab bar on desktop widths (≥76.234375em, matching Material's own
 breakpoint), it doesn't work alongside a site with tabs disabled.
+
+Compatible with `navigation.indexes` — a category label whose own index page
+Material merges in becomes a real link to that page, with correct
+active/current-page state.
 
 ## How it works
 
@@ -59,8 +63,18 @@ so it looks reasonable on any palette out of the box. Override via:
 
 ```css
 :root {
+  /* Default (inactive) label/link color */
   --md-nested-tabs-label-color: ...;
   --md-nested-tabs-link-color: ...;
+
+  /* Active label/link color — the label gets .nested-tabs__label--active
+     when one of its own pages is active, not just the page link itself */
+  --md-nested-tabs-label-active-color: ...;
+  --md-nested-tabs-link-active-color: ...;
+
+  /* Hover/focus label/link color */
+  --md-nested-tabs-label-hover-color: ...;
+  --md-nested-tabs-link-hover-color: ...;
 }
 ```
 

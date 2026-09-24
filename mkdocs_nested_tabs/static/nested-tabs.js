@@ -27,13 +27,28 @@
     list.className = "nested-tabs__list";
 
     topList.querySelectorAll(":scope > li.md-nav__item--nested").forEach(function (section) {
-      const labelEl = section.querySelector(":scope > label.md-nav__link, :scope > a.md-nav__link");
+      // With navigation.indexes enabled, Material wraps the link version in
+      // an extra <div class="md-nav__container"> instead of putting the <a>
+      // directly on the <li> — without that third alternative here, labelEl
+      // comes back null and the whole section silently disappears from this
+      // row, not just its active-state handling.
+      const labelEl = section.querySelector(
+        ":scope > label.md-nav__link, :scope > a.md-nav__link, :scope > .md-nav__container > a.md-nav__link"
+      );
       const nestedNav = section.querySelector(":scope > nav.md-nav");
       if (!labelEl || !nestedNav) return;
 
       const categoryLabel = labelEl.querySelector(".md-ellipsis")
         ? labelEl.querySelector(".md-ellipsis").textContent.trim()
         : labelEl.textContent.trim();
+
+      // With navigation.indexes enabled, Material merges a section's own
+      // index page into its label — labelEl becomes a real <a> (not a
+      // <label> toggle) pointing at that page, and drops it from the child
+      // list entirely. So the label itself, not just one of its children,
+      // can be the active page.
+      const labelIsLink = labelEl.tagName === "A";
+      const labelIsActive = labelIsLink && labelEl.classList.contains("md-nav__link--active");
 
       const childItems = Array.from(nestedNav.querySelectorAll(":scope > ul.md-nav__list > li.md-nav__item"));
       const pageLinks = [];
@@ -52,13 +67,21 @@
       group.className = "nested-tabs__group";
 
       if (flat && pageLinks.length > 0) {
-        const label = document.createElement("span");
-        label.className = "nested-tabs__label";
+        // labelIsLink means navigation.indexes merged this section's own
+        // index page into the label — render it as a real, clickable <a>
+        // (same shape as the fallback branch's label--link below) rather
+        // than an inert <span>, so that page stays reachable from here.
+        const label = document.createElement(labelIsLink ? "a" : "span");
+        label.className = labelIsLink ? "nested-tabs__label nested-tabs__label--link" : "nested-tabs__label";
+        if (labelIsLink) {
+          label.href = labelEl.getAttribute("href");
+        }
         label.textContent = categoryLabel;
         group.appendChild(label);
 
         const pages = document.createElement("ul");
         pages.className = "nested-tabs__pages";
+        let groupHasActive = labelIsActive;
         pageLinks.forEach(function (link) {
           const item = document.createElement("li");
           const a = document.createElement("a");
@@ -70,22 +93,53 @@
           if (link.classList.contains("md-nav__link--active")) {
             a.classList.add("nested-tabs__link--active");
             a.setAttribute("aria-current", "page");
+            groupHasActive = true;
           }
           item.appendChild(a);
           pages.appendChild(item);
         });
         group.appendChild(pages);
+        // Lets a consumer style the category label itself (e.g. "Flow") when
+        // one of its own pages — or, with navigation.indexes, the label's
+        // own merged index page — is the active one, without reaching for a
+        // :has() selector from outside — see nested-tabs.css.
+        if (groupHasActive) {
+          label.classList.add("nested-tabs__label--active");
+          // Only when the label's own page is the active one, not merely a
+          // descendant's — aria-current="page" would misrepresent a parent
+          // category as literally being the current page otherwise.
+          if (labelIsActive) {
+            label.setAttribute("aria-current", "page");
+          }
+        }
       } else {
-        const overviewLink = nestedNav.querySelector(
-          ":scope > ul.md-nav__list > li.md-nav__item > a.md-nav__link"
-        );
-        if (!overviewLink) return;
+        // navigation.indexes merges a section's own index page into its own
+        // label (see labelIsLink above) before this branch ever sees its
+        // children — so when that happened, labelEl already has everything
+        // needed (href + active state) and searching descendants for an
+        // "overview" page would find nothing, dropping the whole section.
+        // Only fall back to that descendant search for the case with no
+        // navigation.indexes merge, where a plain child page (e.g. an
+        // explicit "All" entry) serves as the overview link instead.
+        let overviewHref;
+        let overviewIsActive;
+        if (labelIsLink) {
+          overviewHref = labelEl.getAttribute("href");
+          overviewIsActive = labelIsActive;
+        } else {
+          const overviewLink = nestedNav.querySelector(
+            ":scope > ul.md-nav__list > li.md-nav__item > a.md-nav__link"
+          );
+          if (!overviewLink) return;
+          overviewHref = overviewLink.getAttribute("href");
+          overviewIsActive = overviewLink.classList.contains("md-nav__link--active");
+        }
 
         const label = document.createElement("a");
         label.className = "nested-tabs__label nested-tabs__label--link";
-        label.href = overviewLink.getAttribute("href");
+        label.href = overviewHref;
         label.textContent = categoryLabel;
-        if (overviewLink.classList.contains("md-nav__link--active")) {
+        if (overviewIsActive) {
           label.classList.add("nested-tabs__link--active");
           label.setAttribute("aria-current", "page");
         }

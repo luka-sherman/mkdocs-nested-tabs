@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pip install -e . mkdocs-material pytest
+
+      - run: python -m pytest tests/ -v
+
+  js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # nested-tabs.test.js builds tests/fixture_site_indexes via a real
+      # `mkdocs build` (not hand-written HTML) before running the plugin's
+      # actual JS against the output, so the Python side needs to be
+      # installed here too, not just Node.
+      - run: pip install -e . mkdocs-material
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: tests/js/package-lock.json
+
+      - run: npm ci
+        working-directory: tests/js
+
+      - run: npm test
+        working-directory: tests/js
