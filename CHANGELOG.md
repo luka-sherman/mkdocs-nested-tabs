@@ -15,6 +15,12 @@ All notable changes to this project are documented here. Format based on
 - `--md-nested-tabs-label-hover-color` / `--md-nested-tabs-link-hover-color` — hover/focus-visible
   color hooks for the fallback-link label and page links, previously hardcoded to
   `--md-accent-fg-color` with no override.
+- `navigation.indexes` support. Previously, enabling `navigation.indexes` alongside this plugin
+  silently dropped any category whose own index page Material merges into its label — both a
+  flat category with a `section/index.md` page and a category with a further-nested
+  sub-category (the "Libraries"-style fallback case) — from this row entirely, with no error. A
+  category's label is now rendered as a real link to its merged index page when one exists, with
+  correct active/`aria-current` state.
 
 ## [0.1.0] - 2026-09-23
 
