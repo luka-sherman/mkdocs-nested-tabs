@@ -59,6 +59,7 @@
 
         const pages = document.createElement("ul");
         pages.className = "nested-tabs__pages";
+        let groupHasActive = false;
         pageLinks.forEach(function (link) {
           const item = document.createElement("li");
           const a = document.createElement("a");
@@ -70,11 +71,18 @@
           if (link.classList.contains("md-nav__link--active")) {
             a.classList.add("nested-tabs__link--active");
             a.setAttribute("aria-current", "page");
+            groupHasActive = true;
           }
           item.appendChild(a);
           pages.appendChild(item);
         });
         group.appendChild(pages);
+        // Lets a consumer style the category label itself (e.g. "Flow") when
+        // one of its own pages is the active one, without reaching for a
+        // :has() selector from outside — see nested-tabs.css.
+        if (groupHasActive) {
+          label.classList.add("nested-tabs__label--active");
+        }
       } else {
         const overviewLink = nestedNav.querySelector(
           ":scope > ul.md-nav__list > li.md-nav__item > a.md-nav__link"
