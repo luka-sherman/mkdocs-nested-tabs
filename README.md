@@ -4,6 +4,14 @@ Shows two hierarchy levels of `navigation.tabs` - one parent level, with it's ch
 displayed below it. An alternative to Material for MkDocs' native hover-triggered 
 tab dropdown (one category's children at a time). 
 
+Without the plugin — categories only, children reachable via a hover dropdown:
+
+![Without mkdocs-nested-tabs](docs/images/without-plugin.png)
+
+With the plugin — every category's pages listed at once:
+
+![With mkdocs-nested-tabs](docs/images/with-plugin.png)
+
 ## Status
 
 Published on PyPI. Ported and generalized from a working implementation.
